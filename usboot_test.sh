@@ -30,10 +30,6 @@ then
     rm $USB_MOUNT/boot/grub/grub.cfg
     cp grub.cfg $USB_MOUNT/boot/grub/grub.cfg
 
-    # print_msg "Atualizando tema"
-    # rm -rf $USB_MOUNT/boot/grub/themes
-    # cp -R themes/ $USB_MOUNT/boot/grub/themes
-
     print_msg "Removendo vm"
     VBoxManage unregistervm usboot --delete
     rm $USB_MOUNT/usboot.vdi $USB_MOUNT/usboot.vmdk 

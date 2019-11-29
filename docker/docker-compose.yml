@@ -1,0 +1,13 @@
+version: '3.4'
+
+services:
+  app:
+    container_name: app_env
+    build: 
+      context: ./
+    privileged: true
+    working_dir: /app
+    devices:
+      - "/dev/sdb1:/dev/sdb1"
+    volumes:
+      - ./../:/app
