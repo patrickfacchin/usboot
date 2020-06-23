@@ -1,7 +1,8 @@
 #!/bin/bash
 . src/printings.sh
 
-USB_PATH=/dev/sdb1
+USB_PREFIX=sdd
+USB_PATH=/dev/"$USB_PREFIX"1
 USB_MOUNT=/mnt/usboot
 
 print_banner
@@ -21,6 +22,7 @@ then
         grep -q ^$dev /proc/mounts && umount $dev
     done
     
+    umount /mnt
     rm -rf $USB_MOUNT && mkdir -p $USB_MOUNT
             
     print_msg "Montando device..."
@@ -32,14 +34,13 @@ then
 
     print_msg "Removendo vm"
     VBoxManage unregistervm usboot --delete
-    rm $USB_MOUNT/usboot.vdi $USB_MOUNT/usboot.vmdk 
-    rm -Rf /root/VirtualBox\ VMs/usboot
-
+    vboxmanage closemedium disk ./usboot.vdi --delete
+    
     print_msg "VBOX: criando vmdk ..."
-    VBoxManage internalcommands createrawvmdk -filename $USB_MOUNT/usboot.vmdk -rawdisk /dev/sdb
+    VBoxManage internalcommands createrawvmdk -filename ./usboot.vmdk -rawdisk /dev/$USB_PREFIX
 
     print_msg "VBOX: criando vdi ..."
-    VBoxManage createhd --filename $USB_MOUNT/usboot.vdi --size 512
+    VBoxManage createhd --filename ./usboot.vdi --size 512
 
     print_msg "VBOX: criando vm ..."
     VBoxManage createvm --name usboot --ostype 'Linux_64' --register
@@ -48,7 +49,7 @@ then
     VBoxManage storagectl usboot --name 'IDE Controller' --add ide
 
     print_msg "VBOX: vinculando vmdk a ide controller..."
-    VBoxManage storageattach usboot --storagectl 'IDE Controller' --port 0 --device 0 --type hdd --medium $USB_MOUNT/usboot.vmdk
+    VBoxManage storageattach usboot --storagectl 'IDE Controller' --port 0 --device 0 --type hdd --medium ./usboot.vmdk
 
     print_msg "VBOX: modificando valores da vm ..."
     VBoxManage modifyvm usboot --boot1 disk --boot2 none --boot3 none --boot4 none
