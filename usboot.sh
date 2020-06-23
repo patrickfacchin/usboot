@@ -32,15 +32,14 @@ then
     print_msg "Formatando device ..."
     sgdisk --zap-all /dev/$USB_PREFIX
     sgdisk --new=1:0:0 --typecode=1:ef00 /dev/$USB_PREFIX
-    # mkntfs -L GRUB2EFI /dev/"$USB_PREFIX"1
+    mkntfs -L GRUB2EFI /dev/"$USB_PREFIX"1
     # mkfs.exfat -i DAT -n GRUB2EFI /dev/"$USB_PREFIX"1
-    mkfs.vfat -F32 -n GRUB2EFI /dev/"$USB_PREFIX"1
+    # mkfs.vfat -F32 -n GRUB2EFI /dev/"$USB_PREFIX"1
     
     print_msg "Montando device..."
     mount $USB_PATH $USB_MOUNT
 
-    # print_msg "Montando win10..."
-    # mount ./Win10_2004_EnglishInternational_x64.iso /mnt -o loop
+    
 
     print_msg "Instalando grub..."
     grub-install --force --no-floppy --root-directory=$USB_MOUNT /dev/$USB_PREFIX
@@ -55,10 +54,13 @@ then
     print_msg "Inicializando download de iso..."
     # axel -n 10 $ISO_URL$ISO_FILE
 
-    print_msg "Movendo iso para a pasta de isos..."
+    print_msg "Movendo isos para a pasta de isos..."
     pv $ISO_FILE > $USB_MOUNT/isos/$ISO_FILE
     # pv Win10_2004_EnglishInternational_x64.iso > $USB_MOUNT/isos/Win10_2004_EnglishInternational_x64.iso
 
-    # echo "Copiando arquivos do Windows ..."
-    # cp -r /mnt/* $USB_MOUNT
+    print_msg "Montando win10..."
+    mount ./Win10_2004_EnglishInternational_x64.iso /mnt -o loop
+
+    echo "Copiando arquivos do Windows ..."
+    cp -r /mnt/* $USB_MOUNT
 fi

@@ -3,8 +3,8 @@
 
 USB_PREFIX=sdd
 USB_PATH=/dev/"$USB_PREFIX"1
-USB_MOUNT=/mnt/usboot
-
+USB_MOUNT=/media/usboot
+UUID=`blkid | grep "${USB_PREFIX}1" | sed -n 's/.*\sUUID=\"\([^\"]*\)\".*/\1/p'`
 print_banner
 
 if [ "$(id -u)" != "0" ]; then
@@ -22,7 +22,6 @@ then
         grep -q ^$dev /proc/mounts && umount $dev
     done
     
-    umount /mnt
     rm -rf $USB_MOUNT && mkdir -p $USB_MOUNT
             
     print_msg "Montando device..."
@@ -31,6 +30,7 @@ then
     print_msg "Atualizando grub.cfg"
     rm $USB_MOUNT/boot/grub/grub.cfg
     cp grub.cfg $USB_MOUNT/boot/grub/grub.cfg
+    sed -i "s/%uuid%/$UUID/g" $USB_MOUNT/boot/grub/grub.cfg
 
     print_msg "Removendo vm"
     VBoxManage unregistervm usboot --delete
